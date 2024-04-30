@@ -9,7 +9,7 @@ public class PlayerScript : MonoBehaviour
 
     // Taking the reference or main camera 
     [Header("Player Camera")]
-    public Transform playerCamara;
+    public Transform playerCamera;
 
     [Header("Player Animator and Gravity")]
     public CharacterController cC;
@@ -18,12 +18,12 @@ public class PlayerScript : MonoBehaviour
     public float turnCalmTime = 0.1f;
     float turnCalmVelocity;
 
-    void Update() // Corrected method name to "Update" with capital "U"
+    void Update()
     {
-        PlayerMove(); // Corrected method name to "PlayerMove" with capital "P" and added missing parentheses
+        PlayerMove();
     }
 
-    void PlayerMove() // Corrected method name to "PlayerMove" with capital "P" and added missing parentheses
+    void PlayerMove()
     {
         // Getting input from user
         float horizontal_axis = Input.GetAxisRaw("Horizontal");
@@ -34,14 +34,15 @@ public class PlayerScript : MonoBehaviour
 
         if (direction.magnitude >= 0.1f)
         {
-            // Player Facing direction
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg * playerCamara.eulerAngles.y;
+            // Player facing direction, considering the camera's rotation
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + playerCamera.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnCalmVelocity, turnCalmTime);
-            transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f); // Apply the rotation to the player
 
-            vect
+            // Calculate movement direction based on the target angle
+            Vector3 moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             // Player Movement
-            cC.Move(direction * playerSpeed * Time.deltaTime);
+            cC.Move(moveDirection * playerSpeed * Time.deltaTime);
         }
     }
 }
